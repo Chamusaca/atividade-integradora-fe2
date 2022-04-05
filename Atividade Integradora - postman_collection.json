@@ -1,0 +1,233 @@
+{
+	"info": {
+		"_postman_id": "ec1e3970-a510-45cc-80e5-d4bf81aeb846",
+		"name": "Atividade Integradora",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Puxa todas as tarefas",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/tasks/",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Puxar uma tarefa específica",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/tasks/1",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"tasks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar uma tarefa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"description\": \"Aprender Javascript\",\r\n  \"completed\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/tasks",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Substituir uma tarefa",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"description\": \"Aprender Javascript\",\r\n  \"completed\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/tasks/1",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"tasks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar uma tarefa",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/tasks/1",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"tasks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USERS - Criar um usuário",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"string\",\r\n  \"lastName\": \"string\",\r\n  \"email\": \"string\",\r\n  \"password\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/users",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USERS - Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"string\",\r\n  \"password\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/users/login",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USERS - Obter informações de usuário",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://ctd-todo-api.herokuapp.com/v1/users/getMe",
+					"protocol": "https",
+					"host": [
+						"ctd-todo-api",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"v1",
+						"users",
+						"getMe"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
