@@ -3,7 +3,7 @@
 
     var obterNomeUsuario = fetch(`${API_URL}/users/getMe`)
         .then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             return respostaDoServidor.json();
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
@@ -12,7 +12,7 @@
 
     var listarTodasTarefas = fetch(`${API_URL}/tasks`)
         .then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             return respostaDoServidor.json();
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
@@ -21,7 +21,7 @@
 
     var obterUmaTarefa = fetch(`${API_URL}/tasks/${id}`)
         .then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             return respostaDoServidor;
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
@@ -39,7 +39,7 @@
             },
         })
         .then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             respostaDoServidor.json();
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
@@ -57,7 +57,7 @@
         },
         }
         ).then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             respostaDoServidor.json();
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
@@ -69,15 +69,40 @@
         method: 'DELETE',
         })
         .then(respostaDoServidor => {
-            console.log(respostaDoServidor);
+            // console.log(respostaDoServidor);
             return respostaDoServidor;
         }
     );
+
+    var construirTarefa = function (desc, timestamp) {
+
+        // Seleciona a tarefa <div class="descricao".
+        var selectdescTarefa = document.querySelector('.descricao');
+        
+        // Cria os elementos <p>.
+        var criarPTarefa = document.createElement('p');
+        var criarPTimestamp = document.createElement('p');
+    
+        // Seleciona o texto do input das descrição e armazena para usar na criação da tarefa.
+        desc = document.getElementById('novaTarea').value;
+        var valorTimestamp = timestamp;
+
+        // Criar os nodes de texto e de timestamp
+        var criarTarefa = document.createTextNode(desc);
+        var criarTimestamp = document.createTextNode(valorTimestamp);
+        
+        // Adiciona a descrição ao div.
+        selectdescTarefa.appendChild.criarPTarefa;
+        criarPTarefa.appendChild.criarTarefa;
+
+        // Adiciona o timestamp ao div
+        selectdescTarefa.appendChild.criarPTimestamp;
+        criarPTimestamp.appendChild.criarTimestamp;
+
+    };
     
 
     
 // })
 
-        // let nome = document.getElementsByClassName("user-info");
-        // nome[0].createTextNode(nomeUsuario);
-        // p.appendChild.nome
+        
