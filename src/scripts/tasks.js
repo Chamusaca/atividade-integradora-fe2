@@ -12,15 +12,18 @@
 
     var listarTodasTarefas = fetch(`${API_URL}/tasks`)
         .then(respostaDoServidor => {
-            // Primeira resposta do servidor.
+            console.log(respostaDoServidor);
             return respostaDoServidor.json();
         })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
         .catch(erros => {console.log(erros);}
     );
 
-    var obterTarefa = fetch(`${API_URL}/tasks/${id}`)
-        .then(respostaDoServidor => {return respostaDoServidor;})
+    var obterUmaTarefa = fetch(`${API_URL}/tasks/${id}`)
+        .then(respostaDoServidor => {
+            console.log(respostaDoServidor);
+            return respostaDoServidor;
+        })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
         .catch(erros => {console.log(erros);}
     );
@@ -35,7 +38,10 @@
             'Content-type': 'application/json; charset=UTF-8',
             },
         })
-        .then(respostaDoServidor => {respostaDoServidor.json();})
+        .then(respostaDoServidor => {
+            console.log(respostaDoServidor);
+            respostaDoServidor.json();
+        })
         .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
         .catch(erros => {console.log(erros);}
     );
@@ -50,9 +56,12 @@
             'Content-type': 'application/json; charset=UTF-8',
         },
         }
-        ).then(respostaDoServidor => {respostaDoServidor.json();}
-        ).then(respostaDoServidorJSON => {return respostaDoServidorJSON;}
-        ).catch(erros => {console.log(erros);}
+        ).then(respostaDoServidor => {
+            console.log(respostaDoServidor);
+            respostaDoServidor.json();
+        })
+        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
+        .catch(erros => {console.log(erros);}
     );
     
 
@@ -60,6 +69,7 @@
         method: 'DELETE',
         })
         .then(respostaDoServidor => {
+            console.log(respostaDoServidor);
             return respostaDoServidor;
         }
     );
