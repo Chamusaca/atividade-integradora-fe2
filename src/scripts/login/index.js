@@ -117,7 +117,7 @@ botaoAcessarLogin.addEventListener("click", function (evento) {
     }
 
     function loginErro(statusRecebido) {
-      let loginValidacao = document.getElementById("loginValidacao");
+      let loginValidacao= document.getElementById("loginValidacao");
       elementoSmallErro(loginValidacao);
 
       //Limpa o campo da senha ao errar o login
@@ -159,7 +159,7 @@ botaoAcessarLogin.addEventListener("click", function (evento) {
 });
 
 function resetaValidacaoLoginErro() {
-  loginValidacao.innerHTML = "";
+  loginValidacao.innerHTML == "";
   botaoAcessarLogin.removeAttribute("disabled");
   botaoAcessarLogin.innerText = "Acessar";
   loginApiValidacao = true;
