@@ -5,7 +5,9 @@ let campoSenha = document.getElementById('inputPassword');
 let botaoAcessar = document.getElementById('botaoAcessar');
 
 
-botaoAcessarLogin.addEventListener("click", function (evento) {
+botaoAcessar.addEventListener("click", function (evento) {
+
+    evento.preventDefault();
 
     const loginUsuario = {
         email: "",
@@ -32,4 +34,5 @@ botaoAcessarLogin.addEventListener("click", function (evento) {
         return response.json();}
     ).then((respostaEmJSON) => {
         return respostaEmJSON.jwt}
-    );
+    )}
+);
