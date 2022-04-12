@@ -1,97 +1,192 @@
 // document.addEventListener('load', function () {
     var API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
-    //Criar as variáveis
-    let campoNomeCadastro = document.getElementById("inputNomeCadastro");
-    let campoSobrenomeCadastro = document.getElementById("inputSobrenomeCadastro");
-    let campoEmailCadastro = document.getElementById("inputEmailCadastro");
-    let campoSenhaCadastro = document.getElementById("inputSenhaCadastro");
-    let campoRepetirSenhaCadastro = document.getElementById("inputRepetirSenhaCadastro");
+    //Criar as variáveis para guardar informações dos inputs
+    let campoNovaTarefa = document.getElementById('novaTarea');
 
-    // Puxa os valores dos campos
+    function validarCredenciaisDoUsuario(eventoDoFormulario) {
+
+        // Para não atualizar a página.
+        eventoDoFormulario.preventDefault();
     
+        // Destruturando/Separando os campos e-mail e senha do formulário.
+        let [email, senha] = eventoDoFormulario.target;
+    
+        // Armazena e-mail e senha em variáveis.
+        let emailDoUsuario = email.value;
+        let senhaDoUsuario = senha.value;
+    
+        // Cria um objeto contendo as credenciais do usuário.
+        let credenciaisDoUsuario = {
+            email: emailDoUsuario,
+            password: senhaDoUsuario
+        }
+    
+        // Requisição de autenticação do usuário.
+        autenticarUsuario(credenciaisDoUsuario);
+    
+    }
 
-    let configuracaoGET = {
-        method: 'GET',
-        body: objetoUsuarioCadastroJson,
-        headers: {
-            'Content-type': 'application/json',
-            'authorization': 
-        },
-    };;
 
-    var obterNomeUsuario = fetch(`${API_URL}/users/getMe`, configuracaoGET)
-        .then(respostaDoServidor => {
-            // console.log(respostaDoServidor);
-            return respostaDoServidor.json();
-        })
-        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
-        .catch(erros => {console.log(erros);}
-    );
+    function autenticarUsuario(credenciaisDoUsuario) {
 
-    var listarTodasTarefas = fetch(`${API_URL}/tasks`)
-        .then(respostaDoServidor => {
-            // console.log(respostaDoServidor);
-            return respostaDoServidor.json();
-        })
-        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
-        .catch(erros => {console.log(erros);}
-    );
-
-    var obterUmaTarefa = fetch(`${API_URL}/tasks/${id}`)
-        .then(respostaDoServidor => {
-            // console.log(respostaDoServidor);
-            return respostaDoServidor;
-        })
-        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
-        .catch(erros => {console.log(erros);}
-    );
-
-    var criarNovaTarefa = fetch(`${API_URL}/tasks`, {
-        method: 'POST',
-        body: JSON.stringify({
-            description: 'string',
-            completed: false,
-        }),
-        headers: {
-            'Content-type': 'application/json; charset=UTF-8',
+        // Configurações da requisição POST.
+        let configuracoesPOST = {
+            method: 'POST',
+            body: JSON.stringify(credenciaisDoUsuario),
+            headers: {
+                'Content-Type': 'application/json'
             },
-        })
-        .then(respostaDoServidor => {
-            // console.log(respostaDoServidor);
-            respostaDoServidor.json();
-        })
-        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
-        .catch(erros => {console.log(erros);}
-    );
-
-    var atualizarTarefa = fetch(`${API_URL}/tasks/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-            description: "string",
-            completed: false
-        }),
-        headers: {
-            'Content-type': 'application/json; charset=UTF-8',
-        },
         }
-        ).then(respostaDoServidor => {
-            // console.log(respostaDoServidor);
-            respostaDoServidor.json();
-        })
-        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
-        .catch(erros => {console.log(erros);}
-    );
+    
+        // Requisição de autenticação do usuário.
+        fetch(`${URL_API}/users/login/`, configuracoesPOST)
+            .then(function (respostaDoServidor) {
+                    
+                // Retorno apenas dos dados convertidos em JSON.
+                let JSON = respostaDoServidor.json();
+    
+                // Retorno da promessa convertida em JSON.
+                return JSON;
+            })
+            .then(function (respostaDoServidorEmJSON) {
+                
+                // Capturando o retorno token JWT do Servidor.
+                let tokenDoUsuario = respostaDoServidorEmJSON.jwt;
+    
+                // Requisição dos dados de cadastro do Usuário.
+                pedirInformacoesDoUsuario(tokenDoUsuario);
+    
+                // Apresentando resultado final no console.log().
+                console.log(`POST autenticarUsuario() ${JSON.stringify(respostaDoServidorEmJSON)}`);
+    
+            });
+    }
+    
     
 
-    var deletarTarefa = fetch(`${API_URL}/tasks/${id}`, {
-        method: 'DELETE',
+    function pedirInformacoesDoUsuario(tokenDoUsuario) {
+
+        // Configurações da requisição GET.
+        let configuracoesGET = {
+            method: 'GET',
+            headers: {
+                'authorization': tokenDoUsuario
+            },
+        }
+
+        // Requisição para retorno dos dados de cadastro do usuário.
+        fetch(`${API_URL}/users/getMe/`, configuracoesGET)
+            .then((respostaDoServidor) => {
+                    
+                // Retorno apenas dos dados convertidos em JSON.
+                let JSON = respostaDoServidor.json();
+    
+                // Retorno da promessa convertida em JSON.
+                return JSON;
+            })
+            .then((respostaDoServidorEmJSON) => {
+                
+                // Apresentando resultado final no console.log().
+                console.log(`GET pedirInformacoesDoUsuario() ${JSON.stringify(respostaDoServidorEmJSON)}`);
+    
+            });
+    
+    }
+
+    function listarTodasTarefas(tokenDoUsuario) {
+
+        let configuracoesGET = {
+            method: 'GET',
+            headers: {
+                'authorization': tokenDoUsuario
+            },
+        }
+
+        fetch(`${API_URL}/tasks`, configuracoesGET)
+        .then(respostaDoServidor => {
+            // console.log(respostaDoServidor);
+            return respostaDoServidor.json();
         })
+        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
+        .catch(erros => {console.log(erros);}
+        );
+    }
+
+    function obterUmaTarefa(tokenDoUsuario) {
+
+        let configuracoesGET = {
+            method: 'GET',
+            headers: {
+                'authorization': tokenDoUsuario
+            },
+        }
+
+        fetch(`${API_URL}/tasks/${id}`, configuracoesGET)
         .then(respostaDoServidor => {
             // console.log(respostaDoServidor);
             return respostaDoServidor;
-        }
-    );
+        })
+        .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
+        .catch(erros => {console.log(erros);}
+        )
+    };
+
+    function criarNovaTarefa(tarefa) {
+
+        tarefa = campoNovaTarefa.value;
+
+    
+        fetch(`${API_URL}/tasks`, {
+            method: 'POST',
+            body: JSON.stringify({
+                description: 'string',
+                completed: false,
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                },
+            })
+            .then(respostaDoServidor => {
+            // console.log(respostaDoServidor);
+            respostaDoServidor.json();
+            })
+            .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
+            .catch(erros => {console.log(erros);}
+        )
+    };
+
+    function atualizarTarefa(tarefa) {
+        fetch(`${API_URL}/tasks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                description: "string",
+                completed: false
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            },
+            })
+            .then(respostaDoServidor => {
+                // console.log(respostaDoServidor);
+                respostaDoServidor.json();
+            })
+            .then(respostaDoServidorJSON => {return respostaDoServidorJSON;})
+            .catch(erros => {console.log(erros);}
+        )
+    };
+    
+
+    function deletarTarefa () {
+        fetch(`${API_URL}/tasks/${id}`, {
+            method: 'DELETE',
+            })
+            .then(respostaDoServidor => {
+                // console.log(respostaDoServidor);
+                return respostaDoServidor;
+            }
+        )
+    };
 
     var construirTarefa = function (desc, timestamp) {
 
