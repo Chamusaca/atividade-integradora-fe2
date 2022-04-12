@@ -1,5 +1,4 @@
 /* Variáveis globais ao escopo do JS */
-let API_URL = 'https://ctd-todo-api.herokuapp.com';
 
 //Captura as entradas de dados e ações do usuário na página de cadastro
 let campoNomeCadastro = document.getElementById("inputNomeCadastro");
@@ -44,15 +43,18 @@ botaoCriarConta.addEventListener('click', evento => {
         };
 
         //Chamando a API
-        fetch(`${API_URL}/v1/users`, configuracaoPOST)
-            .then((respostaDoServidor) => {
-                return respostaDoServidor.json();
-                })
-            .then((respostaEmJSON) => {
-                cadastroSucesso(respostaEmJSON.jwt);
+        fetch("https://ctd-todo-api.herokuapp.com/v1/users", configuracaoPOST)
+            .then((response) => {
+                if (response.status == 201) {
+                    return response.json()
+                }
+                /* Se o código for diferente de sucesso (201), lança um throw para que a execução caia no Catch() */
+                throw response;
+            }).then(function (resposta) {
+                cadastroSucesso(resposta.jwt)
             })
             .catch(error => {
-                cadastroErro(error);
+                cadastroErro(error)
             });
     } else {
         alert("Todos os campos devem ser preenchidos para que possa prosseguir")

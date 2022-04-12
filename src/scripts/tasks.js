@@ -1,7 +1,26 @@
 // document.addEventListener('load', function () {
     var API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
-    var obterNomeUsuario = fetch(`${API_URL}/users/getMe`)
+    //Criar as variáveis
+    let campoNomeCadastro = document.getElementById("inputNomeCadastro");
+    let campoSobrenomeCadastro = document.getElementById("inputSobrenomeCadastro");
+    let campoEmailCadastro = document.getElementById("inputEmailCadastro");
+    let campoSenhaCadastro = document.getElementById("inputSenhaCadastro");
+    let campoRepetirSenhaCadastro = document.getElementById("inputRepetirSenhaCadastro");
+
+    // Puxa os valores dos campos
+    
+
+    let configuracaoGET = {
+        method: 'GET',
+        body: objetoUsuarioCadastroJson,
+        headers: {
+            'Content-type': 'application/json',
+            'authorization': 
+        },
+    };;
+
+    var obterNomeUsuario = fetch(`${API_URL}/users/getMe`, configuracaoGET)
         .then(respostaDoServidor => {
             // console.log(respostaDoServidor);
             return respostaDoServidor.json();
