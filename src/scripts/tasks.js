@@ -26,7 +26,11 @@
         autenticarUsuario(credenciaisDoUsuario);
     
     }
-
+    
+    function alteraDadosUsuarioEmTela(objetoUsuarioRecebido) {
+        let nomeUsuarioEmTarefas = document.getElementById('nomeUsuarioEmTarefas');
+        nomeUsuarioEmTarefas.innerText = `${objetoUsuarioRecebido.firstName} ${objetoUsuarioRecebido.lastName}`;
+    }
 
     function autenticarUsuario(credenciaisDoUsuario) {
 
@@ -214,6 +218,13 @@
         criarPTimestamp.appendChild.criarTimestamp;
 
     };
+    // Encerra Sessão.
+    function encerrarSessao() {
+        // Limpa o localStorage.
+        localStorage.clear();
+        // Redireciona para a página de login.
+        window.location.href = 'index.html';
+    }
     
     
 // })

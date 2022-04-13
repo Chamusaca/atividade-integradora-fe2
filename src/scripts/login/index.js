@@ -36,7 +36,9 @@ botaoAcessar.addEventListener("click", function (evento) {
         return response.json();})
     .then((respostaEmJSON) => {
         console.log(respostaEmJSON);
-        loginSucesso(respostaEmJSON.jwt);})
+        loginSucesso(respostaEmJSON.jwt);
+        localStorage.setItem('jsonRecebido', respostaEmJSON.jwt);    
+    })
     .catch((erro) => {
         loginErro(erro);}
     )}
@@ -45,7 +47,6 @@ botaoAcessar.addEventListener("click", function (evento) {
 function loginSucesso(jsonRecebido) {
     console.log("Json validado");
     console.log(jsonRecebido);
-    // localStorage.setItem('jsonRecebido');
     window.location = "tarefas.html";
 }
 
