@@ -220,10 +220,12 @@
     };
     // Encerra Sessão.
     function encerrarSessao() {
-        // Limpa o localStorage.
+        let escolhaUsuario = confirm("Deseja realmente finalizar a sessão e voltar para o login ?");
+        if (escolhaUsuario == true) {
+            window.location.href = "index.html";
+            // Limpa o localStorage.
         localStorage.clear();
-        // Redireciona para a página de login.
-        window.location.href = 'index.html';
+        }
     }
     
     
