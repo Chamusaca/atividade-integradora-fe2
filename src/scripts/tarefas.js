@@ -1,5 +1,4 @@
 // Autenticação do usuário
-
 onload = () => {
     const tokenDoUsuario = localStorage.getItem("jsonRecebido");
 
@@ -13,9 +12,9 @@ onload = () => {
     }
 }
 
+// ------------------ FUNÇÕES PARA COMUNICAÇÃO COM O SERVIDOR ------------------
 
 // URL base da API
-
 let API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
 
@@ -27,7 +26,7 @@ function buscarUsuario(tokenDoUsuario) {
     let configuracoesGET = {
         method: 'GET',
         headers: {
-            'Authorization': `${tokenDoUsuario}`,
+            'authorization': `${tokenDoUsuario}`,
         },
     }
 
@@ -55,6 +54,59 @@ function buscarUsuario(tokenDoUsuario) {
 }
 
 
+// REQUISIÇÃO GET - Listar todas as tarefas
+
+function listarTodasAsTarefas(tokenDoUsuario) {
+    let configGET = {
+        'authorization': `${tokenDoUsuario}`,
+    }
+
+    fetch(`${API_URL}/tasks`, configGET)
+    .then(
+        resultado => {
+            return resultado.json();
+        })
+    .then(
+        resultado => {
+            criarTarefaDOM(resultado);
+        })
+    .catch(
+        erros => {
+            console.log(erros);
+        }
+    );
+}
+
+// REQUISIÇÃO POST - Enviar informações de criar nova tarefa
+
+function enviarTarefaParaOServ(tokenDoUsuario) {
+    let configPOST = {
+        method: 'POST',
+        body: 'objetoTarefaJson',
+        headers: {
+            'Content-type': 'application/json', //responsável elo json no Body
+            'authorization': `${tokenDoUsuario}` //responsável pela autorização (vem do cookie)
+        },
+    }
+
+    fetch(`${API_URL}/tasks`, configPOST)
+    .then(
+        resultado => {
+            return resultado.json();
+        })
+    .then(
+        resultado => {
+            criarTarefaDOM(resultado);
+        })
+    .catch(
+        erros => {
+            console.log(erros);
+        }
+    );
+};
+
+// ------------------ FUNÇÕES PARA MANIPULAÇÃO DO DOM ------------------
+
 // Alterar dados do usuário
 
 function alteraNomeUsuario(dadosUsuario) {
@@ -67,3 +119,45 @@ function alteraNomeUsuario(dadosUsuario) {
 
     selectNome.innerText = `${nome} ${sobrenome}`;
 };
+
+// Encerrar a sessão
+let botaoEncerrarSessao = document.querySelector('#closeApp');
+
+botaoEncerrarSessao.addEventListener('click', evento => {
+    function encerrarSessao() {
+        let escolhaUsuario = confirm("Deseja realmente finalizar a sessão e voltar para o login ?");
+        if (escolhaUsuario) {
+            //Direciona para a tela de login
+            window.location = "index.html";
+            localStorage.clear();
+        }
+    }
+    encerrarSessao(evento);
+});
+
+// Função para criar elemento DOM da tarefa
+
+function criarTarefaDOM(respostaDoServidorEmJSON) {
+    respostaDoServidorEmJSON.map(function(tarefas){
+
+        let desc = tarefas.description;
+        let id = tarefas.id;
+        let timestamp = new Date(tarefas.createdAt).toLocaleDateString("pt-BR");
+
+        let selecionaElementoPai = document.querySelector('#skeleton');
+
+        let tarefaCriada = tarefas.innerHTML += `
+        <li class="tarefa">
+            <div class="not-done" id="selectButton"></div>
+            <div class="descricao">
+                <p class="nome">ID:${id}</p>
+                <p class="nome">${desc}</p>
+                <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
+            </div>
+        </li>
+        `;
+    })
+
+    selecionaElementoPai.appendChild(tarefaCriada);
+
+}
