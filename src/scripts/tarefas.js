@@ -61,12 +61,8 @@ function listarTodasAsTarefas(tokenDoUsuario) {
     }
 
     fetch(`${API_URL}/tasks`, configGET)
-    .then(
-        resultado => {
-            if (resultado.status == 200) {
-                return resultado.json();
-            }
-            throw resultado.status;
+    .then( response => {
+        return response.json();
         }
     ).then(
         resultado => {
@@ -86,7 +82,7 @@ function enviarTarefaParaOServ(tokenDoUsuario) {
         body: objetoTarefaJson,
         headers: {
             'Content-type': 'application/json', //responsável elo json no Body
-            'authorization': `${tokenDoUsuario}` //responsável pela autorização (vem do cookie)
+            'authorization': `${tokenDoUsuario}`
         },
     }
 
@@ -119,7 +115,7 @@ function atualizaTarefa(idTarefa, status, tokenDoUsuario) {
         headers: {
             // Preciso passar ambas propriedade pro Headers da requisição
             'Content-type': 'application/json', //responsável elo json no Body
-            'Authorization': tokenDoUsuario //responsável pela autorização (vem do cookie)
+            'Authorization': `${tokenDoUsuario}`
         },
     }
 
@@ -313,13 +309,12 @@ function renderizaTarefasConcluidas(tarefaRecebida) {
 tarefasTerminadasUl.addEventListener('click', function (tarefaClicada) {
     tarefaClicada.preventDefault(); //Impede de atualizar a pagina
     let targetTarefa = tarefaClicada.target;
-    let cookieJwt = getCookie("jwt");
 
     //Trocar o status da atividade para "pendente"
     if (targetTarefa.className == "fas fa-undo-alt change") {
         let escolhaUsuario = confirm("Deseja realmente voltar esta tarefa para as 'Tarefas Pendentes' ?");
         if (escolhaUsuario) {
-            atualizaTarefa(tarefaClicada.target.id, false, cookieJwt); // true -> A tarefa passa de "Pendente" para "Finalizada"
+            atualizaTarefa(tarefaClicada.target.id, false, tokenDoUsuario); // true -> A tarefa passa de "Pendente" para "Finalizada"
         }
     }
 
@@ -328,7 +323,7 @@ tarefasTerminadasUl.addEventListener('click', function (tarefaClicada) {
 
         let escolhaUsuario = confirm("Deseja realmente deletar esta tarefa ?");
         if (escolhaUsuario) {
-            deletarTarefa(tarefaClicada.target.id, cookieJwt);
+            deletarTarefa(tarefaClicada.target.id, tokenDoUsuario);
         }
     }
 });
