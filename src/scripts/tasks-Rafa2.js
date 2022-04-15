@@ -93,3 +93,65 @@ onload = () => {
         });
     });
 }
+
+
+
+
+// Funções tarefas que eu criei 
+let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
+
+// let selecionaElementoPai = document.querySelector('#skeleton');
+
+function criarTarefaDOM(respostaDoServidorEmJSON) {
+
+    let desc = tarefas.description;
+    let id = tarefas.id;
+    let timestamp = new Date(tarefas.createdAt).toLocaleDateString("pt-BR");
+    
+    let liTarefaPendente = document.createElement('li');
+    liTarefaPendente.classList.add("tarefa");
+    liTarefaPendente.innerHTML += `
+    <div class="not-done" id="selectButton"></div>
+    <div class="descricao">
+        <p class="nome">ID:${id}</p>
+        <p class="nome">${desc}</p>
+        <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
+    </div>
+    `;
+    
+
+    tarefasPendentesUl.appendChild(liTarefaPendente);
+
+}
+
+//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
+tarefasPendentesUl.addEventListener('click', function (tarefaClicada) {
+
+    tarefaClicada.preventDefault(); //Impede de atualizar a pagina
+
+    let targetTarefa = tarefaClicada.target;
+
+    if (targetTarefa.className == "not-done") { //Garante que seja clicado apenas na DIV a esqueda e não em qualquer lugar do card.
+        let escolhaUsuario = confirm("Deseja realmente mover esta tarefa para as 'Tarefas Terminadas' ?");
+        if (escolhaUsuario) {
+            let cookieJwt = getCookie("jwt");
+            //Invoca função de atualização, passando o uuid, o status e o tokenJWT
+            atualizaTarefa(tarefaClicada.target.id, true, tokenDoUsuario); // true -> A tarefa passa de "Pendente" para "Finalizada"
+        }
+    }
+});
+
+//Card que simboliza nenhuma tarefa pendente cadastrada na API
+function nenhumaTarefaPendenteEncontrada() {
+    let liTarefaPendente = document.createElement('li');
+    liTarefaPendente.classList.add("tarefa");
+
+    liTarefaPendente.innerHTML =
+        `
+        <div class="descricao">
+            <p class="nome">Você ainda não possui nenhuma tarefa cadastrada em nosso sistema</p>
+        </div
+    `
+    //Adiciona a lista principal
+    tarefasPendentesUl.appendChild(liTarefaPendente);
+}

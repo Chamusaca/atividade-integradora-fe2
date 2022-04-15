@@ -9,6 +9,7 @@ onload = () => {
     else {
         console.log(tokenDoUsuario);
         buscarUsuario(tokenDoUsuario);
+        listarTodasAsTarefas(tokenDoUsuario);
     }
 }
 
@@ -18,8 +19,7 @@ onload = () => {
 let API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
 
-// Buscar dados do usuário
-
+// REQUISIÇÃO GET - Buscar dados do usuário
 function buscarUsuario(tokenDoUsuario) {
 
     // Configurações da requisição GET.
@@ -55,7 +55,6 @@ function buscarUsuario(tokenDoUsuario) {
 
 
 // REQUISIÇÃO GET - Listar todas as tarefas
-
 function listarTodasAsTarefas(tokenDoUsuario) {
     let configGET = {
         'authorization': `${tokenDoUsuario}`,
@@ -64,13 +63,16 @@ function listarTodasAsTarefas(tokenDoUsuario) {
     fetch(`${API_URL}/tasks`, configGET)
     .then(
         resultado => {
-            return resultado.json();
-        })
-    .then(
+            if (resultado.status == 200) {
+                return resultado.json();
+            }
+            throw resultado.status;
+        }
+    ).then(
         resultado => {
-            criarTarefaDOM(resultado);
-        })
-    .catch(
+            manipulandoTarefasUsuario(resultado);
+        }
+    ).catch(
         erros => {
             console.log(erros);
         }
@@ -78,11 +80,10 @@ function listarTodasAsTarefas(tokenDoUsuario) {
 }
 
 // REQUISIÇÃO POST - Enviar informações de criar nova tarefa
-
 function enviarTarefaParaOServ(tokenDoUsuario) {
     let configPOST = {
         method: 'POST',
-        body: 'objetoTarefaJson',
+        body: objetoTarefaJson,
         headers: {
             'Content-type': 'application/json', //responsável elo json no Body
             'authorization': `${tokenDoUsuario}` //responsável pela autorização (vem do cookie)
@@ -105,6 +106,63 @@ function enviarTarefaParaOServ(tokenDoUsuario) {
     );
 };
 
+// REQUISIÇÃO PUT - Atualizar informações de criar nova tarefa
+function atualizaTarefa(idTarefa, status, tokenDoUsuario) {
+
+    let configPUT = {
+        method: 'PUT',
+        body: JSON.stringify(
+            {
+                completed: status
+            }
+        ),
+        headers: {
+            // Preciso passar ambas propriedade pro Headers da requisição
+            'Content-type': 'application/json', //responsável elo json no Body
+            'Authorization': tokenDoUsuario //responsável pela autorização (vem do cookie)
+        },
+    }
+
+    //Chamar a API
+    fetch(`${API_URL}/tasks/${idTarefa}`, configPUT)
+        .then( response => {
+                return response.json()
+            })
+        .then(function () {
+            alert("A tarefa foi atualizada com sucesso!")
+            //Recarrega a página para atualizar a lista com a "nova" tarefa cadastrada
+            window.location.reload();
+        })
+        .catch(error => {
+            loginErro(error)
+        });
+}
+
+/// REQUISIÇÃO DELETE - Deletar uma tarefa
+function deletarTarefa(idTarefa, tokenDoUsuario) {
+
+    let configDELETE = {
+        method: 'DELETE',
+        headers: {
+            'Authorization': tokenDoUsuario
+        },
+    }
+
+    //@@@Chamando a API
+    fetch(`${API_URL}tasks/${idTarefa}`, configDELETE)
+        .then(response => {
+            return response.json();
+        })
+        .then( function () {
+            alert("A tarefa foi deletada com sucesso!")
+            //Recarrega a página para atualiza a lista com a "nova" tarefa cadastrada
+            window.location.reload();
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}
+
 // ------------------ FUNÇÕES PARA MANIPULAÇÃO DO DOM ------------------
 
 // Alterar dados do usuário
@@ -125,7 +183,7 @@ let botaoEncerrarSessao = document.querySelector('#closeApp');
 
 botaoEncerrarSessao.addEventListener('click', evento => {
     function encerrarSessao() {
-        let escolhaUsuario = confirm("Deseja realmente finalizar a sessão e voltar para o login ?");
+        let escolhaUsuario = confirm(`Deseja realmente finalizar a sessão?`);
         if (escolhaUsuario) {
             //Direciona para a tela de login
             window.location = "index.html";
@@ -135,29 +193,142 @@ botaoEncerrarSessao.addEventListener('click', evento => {
     encerrarSessao(evento);
 });
 
-// Função para criar elemento DOM da tarefa
+// ------------------ FUNÇÕES PARA TAREFAS PENDENTES -------------------
+
+let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
+
+// Listar todas as tarefas
+
+function manipulandoTarefasUsuario(listaDeTarefas) {
+    //Se a lista de tarefas retornar vazia da api...
+    listaDeTarefas.map(tarefa => {
+        if (tarefa.completed) {
+            renderizaTarefasConcluidas(tarefa);
+        } else {
+            renderizaTarefasPendentes(tarefa);
+        }
+    });
+
+};
 
 function criarTarefaDOM(respostaDoServidorEmJSON) {
-    respostaDoServidorEmJSON.map(function(tarefas){
 
-        let desc = tarefas.description;
-        let id = tarefas.id;
-        let timestamp = new Date(tarefas.createdAt).toLocaleDateString("pt-BR");
+    let desc = respostaDoServidorEmJSON.description;
+    let id = respostaDoServidorEmJSON.id;
+    let timestamp = new Date(respostaDoServidorEmJSON.createdAt).toLocaleDateString("pt-BR");
+    
+    let liTarefaPendente = document.createElement('li');
+    liTarefaPendente.classList.add("tarefa");
+    liTarefaPendente.innerHTML += `
+        <div class="not-done" id="selectButton"></div>
+        <div class="descricao">
+            <p class="nome">ID:${id}</p>
+            <p class="nome">${desc}</p>
+            <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
+        </div>
+    `;
+    
 
-        let selecionaElementoPai = document.querySelector('#skeleton');
+    tarefasPendentesUl.appendChild(liTarefaPendente);
 
-        let tarefaCriada = tarefas.innerHTML += `
-        <li class="tarefa">
-            <div class="not-done" id="selectButton"></div>
-            <div class="descricao">
-                <p class="nome">ID:${id}</p>
-                <p class="nome">${desc}</p>
-                <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
-            </div>
-        </li>
-        `;
-    })
+};
 
-    selecionaElementoPai.appendChild(tarefaCriada);
+// Enviar uma tarefa nova
+let botaoCadastrar = document.getElementById("botaoTarefas");
 
+botaoCadastrar.addEventListener('click', evento => {
+    evento.preventDefault();
+
+    let descricaoTarefa = document.getElementById('novaTarefa');
+    let radioGrupo = document.getElementsByName('grupoRadio');
+    let radioSelecionado;
+    //Verifica qual foi o radio selecionado e armazena em uma variável
+    radioGrupo.forEach(radio => radioSelecionado = radio.checked);
+
+    //Cria objeto JS que será convertido para JSON
+    const objetoTarefa = {
+        description: descricaoTarefa.value,
+        completed: radioSelecionado
+    }
+
+    let objetoTarefaJson = JSON.stringify(objetoTarefa);
+
+    enviarTarefaParaOServ(objetoTarefaJson);
+
+    });
+
+//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
+tarefasPendentesUl.addEventListener('click', function (tarefaClicada) {
+
+    // tarefaClicada.preventDefault(); //Impede de atualizar a pagina
+    let targetTarefa = tarefaClicada.target;
+
+    if (targetTarefa.className == "not-done") { //Garante que seja clicado apenas na DIV a esqueda e não em qualquer lugar do card.
+        //Invoca função de atualização, passando o uuid, o status e o tokenJWT
+        atualizaTarefa(tarefaClicada.target.id, true, `${tokenDoUsuario}`); // true -> A tarefa passa de "Pendente" para "Finalizada"
+    }
+});
+
+//Card que simboliza nenhuma tarefa pendente cadastrada na API
+function nenhumaTarefaPendenteEncontrada() {
+    let liTarefaPendente = document.createElement('li');
+    liTarefaPendente.classList.add("tarefa");
+
+    liTarefaPendente.innerHTML =
+        `
+        <div class="descricao">
+            <p class="nome">Você ainda não possui nenhuma tarefa cadastrada em nosso sistema</p>
+        </div
+    `
+    //Adiciona a lista principal
+    tarefasPendentesUl.appendChild(liTarefaPendente);
 }
+
+
+// ------------------- FUNÇÕES PARA TAREFAS CONCLUÍDAS --------------------
+
+let tarefasTerminadasUl = document.querySelector(".tarefas-terminadas");
+
+function renderizaTarefasConcluidas(tarefaRecebida) {
+    let liTarefaTerminada = document.createElement('li');
+    liTarefaTerminada.classList.add("tarefa");
+    //liTarefaPendente.setAttribute('class', 'tarefa'); //Também é possível
+
+    liTarefaTerminada.innerHTML =
+        `
+        <div class="done"></div>
+        <div class="descricao">
+            <p class="nome">${tarefaRecebida.description}</p>
+            <div>
+                <button><i id="${tarefaRecebida.id}" class="fas fa-undo-alt change"></i></button>
+                <button><i id="${tarefaRecebida.id}" class="far fa-trash-alt"></i></button>
+            </div>
+        </div>
+    `
+    //Adiciona a lista principal
+    tarefasTerminadasUl.appendChild(liTarefaTerminada);
+}
+
+//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
+tarefasTerminadasUl.addEventListener('click', function (tarefaClicada) {
+    tarefaClicada.preventDefault(); //Impede de atualizar a pagina
+    let targetTarefa = tarefaClicada.target;
+    let cookieJwt = getCookie("jwt");
+
+    //Trocar o status da atividade para "pendente"
+    if (targetTarefa.className == "fas fa-undo-alt change") {
+        let escolhaUsuario = confirm("Deseja realmente voltar esta tarefa para as 'Tarefas Pendentes' ?");
+        if (escolhaUsuario) {
+            atualizaTarefa(tarefaClicada.target.id, false, cookieJwt); // true -> A tarefa passa de "Pendente" para "Finalizada"
+        }
+    }
+
+    //Deletar uma tarefa por seu uuid
+    if (targetTarefa.className == "far fa-trash-alt") {
+
+        let escolhaUsuario = confirm("Deseja realmente deletar esta tarefa ?");
+        if (escolhaUsuario) {
+            deletarTarefa(tarefaClicada.target.id, cookieJwt);
+        }
+    }
+});
