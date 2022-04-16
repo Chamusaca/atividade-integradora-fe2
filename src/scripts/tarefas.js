@@ -57,13 +57,18 @@ function buscarUsuario(tokenDoUsuario) {
 // REQUISIÇÃO GET - Listar todas as tarefas
 function listarTodasAsTarefas(tokenDoUsuario) {
     let configGET = {
-        'authorization': `${tokenDoUsuario}`,
-    }
-
-    fetch(`${API_URL}/tasks`, configGET)
-    .then( response => {
-        return response.json();
+        method: 'GET',
+        headers: {
+            authorization: tokenDoUsuario
         }
+    };
+    console.log("consultando minhas tarefas");
+    fetch(`${API_URL}/tasks`, configGET)
+    .then(response => response.json())
+    .then(tarefas => {
+        console.log(tarefas);
+    }
+    
     ).then(
         resultado => {
             manipulandoTarefasUsuario(resultado);
@@ -73,6 +78,10 @@ function listarTodasAsTarefas(tokenDoUsuario) {
             console.log(erros);
         }
     );
+    const skeleton = document.querySelector('#skeleton');
+    if(skeleton) {
+        skeleton.remove();
+    }
 }
 
 // REQUISIÇÃO POST - Enviar informações de criar nova tarefa
@@ -209,25 +218,76 @@ function manipulandoTarefasUsuario(listaDeTarefas) {
 
 function criarTarefaDOM(respostaDoServidorEmJSON) {
 
-    let desc = respostaDoServidorEmJSON.description;
-    let id = respostaDoServidorEmJSON.id;
-    let timestamp = new Date(respostaDoServidorEmJSON.createdAt).toLocaleDateString("pt-BR");
-    
-    let liTarefaPendente = document.createElement('li');
-    liTarefaPendente.classList.add("tarefa");
-    liTarefaPendente.innerHTML += `
-        <div class="not-done" id="selectButton"></div>
-        <div class="descricao">
-            <p class="nome">ID:${id}</p>
-            <p class="nome">${desc}</p>
-            <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
-        </div>
-    `;
-    
+    const tarefasPendentes = document.querySelector('.tarefas-pendentes');
+      tarefasPendentes.innerHTML = "";
+      const tarefasTerminadas = document.querySelector('.tarefas-terminadas');
+      tarefasTerminadas.innerHTML = "";
+  
+      respostaDoServidorEmJSON.forEach(tarefa => {
+        //variable intermedia para manipular la fecha
+        let fecha = new Date(tarea.createdAt);
+  
+        if (tarefa.completed) {
+          //lo mandamos al listado de tareas incompletas
+          tarefasTerminadas.innerHTML += `
+                          <li class="tarefa">
+                              <div class="done"></div>
+                              <div class="descricao">
+                              <div>
+                                  <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
+                                  <button><i id="${tarefa.id}" class="far fa-trash-alt"></i></button>
+                              </div>
+                                  <p class="nombre">${tarefa.description}</p>
+                                  <p class="timestamp"><i class="far fa-calendar-alt"></i>${fecha.toLocaleDateString()} <i class="far fa-clock"></i>${fecha.getHours()}:${fecha.getMinutes()}</p>
+                              </div>
+                          </li>
+                          `
+        } else {
+          //lo mandamos al listado de tareas terminadas
+          tarefasPendentes.innerHTML += `
+                          <li class="tarea">
+                              <div class="not-done change" id="${tarefa.id}"></div>
+                              <div class="descricao">
+                                  <p class="nombre">${tarefa.description}</p>
+                                  <p class="timestamp"><i class="far fa-calendar-alt"></i>${fecha.toLocaleDateString()} <i class="far fa-clock"></i>${fecha.getHours()}:${fecha.getMinutes()}</p>
+                              </div>
+                          </li>
+                          `
+        }
+      });
+    };
 
-    tarefasPendentesUl.appendChild(liTarefaPendente);
-
-};
+//     let desc = respostaDoServidorEmJSON.description;
+//     let id = respostaDoServidorEmJSON.id;
+//     let timestamp = new Date(respostaDoServidorEmJSON.createdAt).toLocaleDateString("pt-BR");
+//     if (tarefa.completed){
+    
+//     let liTarefaPendente = document.createElement('li');
+//     liTarefaPendente.classList.add("tarefa");
+//     liTarefaPendente.innerHTML += `
+//         <div class="not-done" id="selectButton"></div>
+//         <div class="descricao">
+//             <p class="nome">ID:${id}</p>
+//             <p class="nome">${desc}</p>
+//             <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
+//         </div>
+//     `;
+//         } else {
+//             let liTarefaConcluida = document.createElement('li');
+//             liTarefaConcluida.classList.add("tarefa");
+//             liTarefaConcluida.innerHTML += `
+//                 <div class="done" id="selectButton"></div>
+//                 <div class="descricao">
+//                     <p class="nome">ID:${id}</p>
+//                     <p class="nome">${desc}</p>
+//                     <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
+//                 </div>
+//             `;
+    
+//             tarefasPendentesUl.appendChild(tarefasPendentesUl);
+           
+//     }
+// };
 
 // Enviar uma tarefa nova
 let botaoCadastrar = document.getElementById("botaoTarefas");
