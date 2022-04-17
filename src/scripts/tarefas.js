@@ -225,7 +225,7 @@ function criarTarefaDOM(respostaDoServidorEmJSON) {
   
       respostaDoServidorEmJSON.forEach(tarefa => {
         //variable intermedia para manipular la fecha
-        let fecha = new Date(tarea.createdAt);
+        let fecha = new Date(tarefa.createdAt);
   
         if (tarefa.completed) {
           //lo mandamos al listado de tareas incompletas
