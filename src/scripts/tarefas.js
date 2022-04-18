@@ -63,26 +63,23 @@ function listarTodasAsTarefas(tokenDoUsuario) {
         }
     };
     console.log("consultando minhas tarefas");
-    fetch(`${API_URL}/tasks`, configGET)
-    .then(response => response.json())
-    .then(tarefas => {
-        console.log(tarefas);
-    }
-    
-    ).then(
-        resultado => {
-            manipulandoTarefasUsuario(resultado);
-        }
-    ).catch(
-        erros => {
-            console.log(erros);
-        }
-    );
-    const skeleton = document.querySelector('#skeleton');
-    if(skeleton) {
-        skeleton.remove();
-    }
+    fetch(`${API_URL}/tasks/`, configGET)
+        .then(respostaDoServidor => respostaDoServidor.json())
+        .then(respostaDoServidorEmJSON => {
+            console.log(respostaDoServidorEmJSON);
+            const skeleton = document.querySelector('#skeleton');
+        if (skeleton) {
+            skeleton.remove();
+        } 
+
+        listarTarefas(respostaDoServidorEmJSON);
+        botaoMudarEstato();
+        otaoExcluirTarefa();
+
+        })
+        .catch(erro => console.log(erro));
 }
+
 
 // REQUISIÇÃO POST - Enviar informações de criar nova tarefa
 function enviarTarefaParaOServ(tokenDoUsuario) {
@@ -198,95 +195,63 @@ botaoEncerrarSessao.addEventListener('click', evento => {
     encerrarSessao(evento);
 });
 
+//listar tarefas no DOM
+function listarTarefas(lista) {
+    const tarefasPendentes = document.querySelector('.tarefas-pendentes');
+    tarefasPendentes.innerHTML = '';
+    const tarefasConcluidas = document.querySelector('.tarefas-terminadas');
+    tarefasConcluidas.innerHTML = '';
+
+    lista.forEach(tarefa => {
+        let terminada = new Date(tarefa.createdAt);
+    if (tarefa.completada) {
+        tarefasConcluidas.innerHTML += `
+        <li class="tarefa">
+            <div class="done"></div>
+            <div class="descricao">
+            <div class="nome">
+            <div class="timestamp">
+            <div>
+                <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
+                <button><i id="${tarefa.id}" class="fas fa-trash-alt delete"></i></button>
+            </div>
+                <p class="id">#${tarefa.id}</p>            
+                <p class="nome">${tarefa.description}</p>
+                <p class="timestamp"><i class="far fa-calendar-alt"></i>${terminada.toLocaleDateString()} <i class="far fa-clock"></i>${terminada.getHours()}:${terminada.getMinutes()}</p>
+            </div>
+        </li>
+        `
+    } else {
+        tarefasPendentes.innerHTML += `
+        <li class="tarefa">
+            <div class="not-done change" id="${tarefa.id}"></div>
+            <div class="descricao">
+                <p class="id">ID: ${tarefa.id}</p>       
+                <p class="nome">${tarefa.description}</p>
+                <p class="timestamp"><i class="far fa-calendar-alt"></i> ${terminada.toLocaleDateString()} <i class="far fa-clock"></i> ${terminada.getHours()}:${terminada.getMinutes()}</p>
+            </div>
+        </li>
+        `
+    }
+});
+}
+
 // ------------------ FUNÇÕES PARA TAREFAS PENDENTES -------------------
 
-let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
+// let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
 
 // Listar todas as tarefas
 
-function manipulandoTarefasUsuario(listaDeTarefas) {
-    //Se a lista de tarefas retornar vazia da api...
-    listaDeTarefas.map(tarefa => {
-        if (tarefa.completed) {
-            renderizaTarefasConcluidas(tarefa);
-        } else {
-            renderizaTarefasPendentes(tarefa);
-        }
-    });
-
-};
-
-function criarTarefaDOM(respostaDoServidorEmJSON) {
-
-    const tarefasPendentes = document.querySelector('.tarefas-pendentes');
-      tarefasPendentes.innerHTML = "";
-      const tarefasTerminadas = document.querySelector('.tarefas-terminadas');
-      tarefasTerminadas.innerHTML = "";
-  
-      respostaDoServidorEmJSON.forEach(tarefa => {
-        //variable intermedia para manipular la fecha
-        let fecha = new Date(tarefa.createdAt);
-  
-        if (tarefa.completed) {
-          //lo mandamos al listado de tareas incompletas
-          tarefasTerminadas.innerHTML += `
-                          <li class="tarefa">
-                              <div class="done"></div>
-                              <div class="descricao">
-                              <div>
-                                  <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
-                                  <button><i id="${tarefa.id}" class="far fa-trash-alt"></i></button>
-                              </div>
-                                  <p class="nombre">${tarefa.description}</p>
-                                  <p class="timestamp"><i class="far fa-calendar-alt"></i>${fecha.toLocaleDateString()} <i class="far fa-clock"></i>${fecha.getHours()}:${fecha.getMinutes()}</p>
-                              </div>
-                          </li>
-                          `
-        } else {
-          //lo mandamos al listado de tareas terminadas
-          tarefasPendentes.innerHTML += `
-                          <li class="tarea">
-                              <div class="not-done change" id="${tarefa.id}"></div>
-                              <div class="descricao">
-                                  <p class="nombre">${tarefa.description}</p>
-                                  <p class="timestamp"><i class="far fa-calendar-alt"></i>${fecha.toLocaleDateString()} <i class="far fa-clock"></i>${fecha.getHours()}:${fecha.getMinutes()}</p>
-                              </div>
-                          </li>
-                          `
-        }
-      });
-    };
-
-//     let desc = respostaDoServidorEmJSON.description;
-//     let id = respostaDoServidorEmJSON.id;
-//     let timestamp = new Date(respostaDoServidorEmJSON.createdAt).toLocaleDateString("pt-BR");
-//     if (tarefa.completed){
-    
-//     let liTarefaPendente = document.createElement('li');
-//     liTarefaPendente.classList.add("tarefa");
-//     liTarefaPendente.innerHTML += `
-//         <div class="not-done" id="selectButton"></div>
-//         <div class="descricao">
-//             <p class="nome">ID:${id}</p>
-//             <p class="nome">${desc}</p>
-//             <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
-//         </div>
-//     `;
+// function manipulandoTarefasUsuario(listaDeTarefas) {
+//     //Se a lista de tarefas retornar vazia da api...
+//     listaDeTarefas.map(tarefa => {
+//         if (tarefa.completed) {
+//             renderizaTarefasConcluidas(tarefa);
 //         } else {
-//             let liTarefaConcluida = document.createElement('li');
-//             liTarefaConcluida.classList.add("tarefa");
-//             liTarefaConcluida.innerHTML += `
-//                 <div class="done" id="selectButton"></div>
-//                 <div class="descricao">
-//                     <p class="nome">ID:${id}</p>
-//                     <p class="nome">${desc}</p>
-//                     <p class="timestamp"><i class="far fa-calendar-alt"></i> ${timestamp}</p>
-//                 </div>
-//             `;
-    
-//             tarefasPendentesUl.appendChild(tarefasPendentesUl);
-           
-//     }
+//             renderizaTarefasPendentes(tarefa);
+//         }
+//     });
+
 // };
 
 // Enviar uma tarefa nova
