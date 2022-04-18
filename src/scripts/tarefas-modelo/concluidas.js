@@ -37,7 +37,7 @@ tarefasTerminadasUl.addEventListener('click', function (tarefaClicada) {
         }
     }
 
-    //Deletar uma tarefa por seu uuid
+    //Deletar uma tarefa por seu id
     if (targetTarefa.className == "far fa-trash-alt") {
 
         let escolhaUsuario = confirm("Deseja realmente deletar esta tarefa ?");
