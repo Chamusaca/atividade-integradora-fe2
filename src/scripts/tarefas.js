@@ -236,47 +236,44 @@ function listarTarefas(lista) {
 });
 }
 
-// ------------------ FUNÇÕES PARA TAREFAS PENDENTES -------------------
+// ------------------ FUNÇÕES PARA TAREFAS -------------------
+// Criando uma nova tarefa
+const tokenDoUsuario = localStorage.getItem("jsonRecebido");
 
-// let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
+const formCriarTarefa = document.querySelector('.nova-tarefa');
+const novaTarefa = document.querySelector('#novaTarefa');
 
-// Listar todas as tarefas
+listarTodasAsTarefas(tokenDoUsuario);
 
-// function manipulandoTarefasUsuario(listaDeTarefas) {
-//     //Se a lista de tarefas retornar vazia da api...
-//     listaDeTarefas.map(tarefa => {
-//         if (tarefa.completed) {
-//             renderizaTarefasConcluidas(tarefa);
-//         } else {
-//             renderizaTarefasPendentes(tarefa);
-//         }
-//     });
-
-// };
-
-// Enviar uma tarefa nova
-let botaoCadastrar = document.getElementById("botaoTarefas");
-
-botaoCadastrar.addEventListener('click', evento => {
+formCriarTarefa.addEventListener('submit', function (evento) {
     evento.preventDefault();
+    console.log('Criando nova tarefa');
+    console.log(novaTarefa.value);
+    
+    const load = {
+        description: novaTarefa.value.trim(),
+    };
 
-    let descricaoTarefa = document.getElementById('novaTarefa');
-    let radioGrupo = document.getElementsByName('grupoRadio');
-    let radioSelecionado;
-    //Verifica qual foi o radio selecionado e armazena em uma variável
-    radioGrupo.forEach(radio => radioSelecionado = radio.checked);
-
-    //Cria objeto JS que será convertido para JSON
-    const objetoTarefa = {
-        description: descricaoTarefa.value,
-        completed: radioSelecionado
-    }
-
-    let objetoTarefaJson = JSON.stringify(objetoTarefa);
-
-    enviarTarefaParaOServ(objetoTarefaJson);
-
-    });
+    let configPOST = {
+        method: 'POST',
+        body: JSON.stringify(load),
+        headers: {
+            authorization: tokenDoUsuario,
+            'Content-Type': 'application/json',
+        },
+    };
+    
+    console.log("Criando uma tarefa na API");    
+    fetch(`${API_URL}/tasks/`, configPOST)
+        .then(respostaDoServidor => respostaDoServidor.json())
+        .then(respostaDoServidorEmJSON => {
+            console.log(respostaDoServidorEmJSON);
+            listarTodasAsTarefas(tokenDoUsuario);
+        })
+        .catch(erro => console.log(erro));
+        formCriarTarefa.reset();
+        
+});
 
 //Captura toda a lista e verifica qual foi o elemento clicado (com o target)
 tarefasPendentesUl.addEventListener('click', function (tarefaClicada) {
