@@ -8,7 +8,10 @@
   <title>To-Do App</title>
 
   <!-- ---------------- estilos compartilhados entre login e signup ---------------- -->
-  <link rel="stylesheet" href="./styles/acesso.css">
+  <link rel="stylesheet" href="./styles/access.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="./assets/images/favicon.svg">
 </head>
 
 <body>
@@ -17,34 +20,32 @@
   </div>
 
   <div class="right">
-    <form>
+    <form novalidate>
       <div class="form-header">
         <p>To-Do App</p>
       </div>
       <h1>Acessar</h1>
 
-
       <label>
         Email:
-        <input id="inputEmail" type="email">
-        <small id="inputEmailValidacao"></small>
+        <input id="inputEmailLogin" type="email">
+        <small class="erro" hidden></small>
       </label>
       <label>
         Senha:
-        <input id="inputPassword" type="password">
-        <small id="inputPasswordValidacao"></small>
+        <input id="inputSenhaLogin" type="password">
+        <small class="erro" hidden></small>
       </label>
-<br>
-      <small id="loginValidacao"></small>
+
       <button id="botaoAcessar" type="submit">Acessar</button>
 
     </form>
     <div class="ingressar">
-      <a href="signup.html">Não possui conta? Crie agora mesmo</a>
+      Não tem uma conta? <a href="signup.html">Inscreva-se</a>
     </div>
   </div>
   <!-- ---------------------- lógica aplicada no login ----------------------- -->
-  <script src="./scripts/validacoes/utils.js"></script>
+  <script src="./scripts/validations/utils.js"></script>
   <script src="./scripts/login/index.js"></script>
 </body>
 

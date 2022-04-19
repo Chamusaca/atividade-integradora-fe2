@@ -1,6 +1,6 @@
 // Autenticação do usuário
 onload = () => {
-    const tokenDoUsuario = localStorage.getItem("jsonRecebido");
+    const tokenDoUsuario = sessionStorage.getItem("jwt");
 
     if (tokenDoUsuario == "" || tokenDoUsuario == null || tokenDoUsuario == undefined) {
         alert("Você não tem permissão para acessar essa página.");
@@ -121,7 +121,7 @@ function botaoMudarEstado() {
 
 /* --------------------------FUNÇÕES PARA TAREFAS --------------------------------*/
 // Criando uma nova tarefa
-const tokenDoUsuario = localStorage.getItem("jsonRecebido");
+const tokenDoUsuario = sessionStorage.getItem("jwt");
 
 const formCriarTarefa = document.querySelector('.nova-tarefa');
 const novaTarefa = document.querySelector('#novaTarefa');
@@ -209,7 +209,7 @@ botaoEncerrarSessao.addEventListener('click', evento => {
         if (escolhaUsuario) {
             //Direciona para a tela de login
             window.location = "index.html";
-            localStorage.clear();
+            sessionStorage.clear();
         }
     }
     encerrarSessao(evento);

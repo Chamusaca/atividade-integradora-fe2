@@ -1,60 +1,56 @@
-// Variável para a URL base 
-let API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
+// URL base da API
+const API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
-// Criar variáveis para puxar os valores
-let campoUsuario = document.getElementById('inputEmail');
-let campoSenha = document.getElementById('inputPassword');
-let botaoAcessar = document.getElementById('botaoAcessar');
+// Seleção do formulário de login e seus inputs 
+const formulario = document.querySelector("form"); 
+const inputs = document.querySelectorAll("input");
 
-// Definir o evento de enviar as informações quando clicar no botão
-botaoAcessar.addEventListener("click", function (evento) {
-
-    evento.preventDefault();
-
-    const loginUsuario = {
-        email: "",
-        password: "",
-    };
-    
-    //Atribui as informações e valida no Objeto do usuário
-    loginUsuario.email = campoUsuario.value;
-    loginUsuario.password = campoSenha.value;
-
-    let loginUsuarioEmJson = JSON.stringify(loginUsuario);
-
-    let configuracoesPOST = {
-        method: 'POST',
-        body: loginUsuarioEmJson,
-        headers: {
-            'Content-type': 'application/json',
-        },
-    }
-
-    // Fetch para enviar informações pro servidor
-    fetch(`${API_URL}/users/login`, configuracoesPOST)
-    .then((response) => {
-        if (response.status == 201){
-            return response.json();
-        }
-        throw response;
-        })
-    .then((respostaEmJSON) => {
-        console.log(respostaEmJSON);
-        loginSucesso(respostaEmJSON.jwt);
-        localStorage.setItem('jsonRecebido', respostaEmJSON.jwt);    
-    })
-    .catch((erro) => {
-        loginErro(erro);}
-    )}
-);
-
-function loginSucesso(jsonRecebido) {
-    console.log("Json validado");
-    console.log(jsonRecebido);
-    window.location = "tarefas.html";
+// Dados para login do usuário no aplicativo To-Do
+const loginUsuario = {
+    email: "",
+    password: ""
 }
 
-function loginErro(statusRecebido) {
-    alert("Erro ao logar, email e/ou senha incorretos");
-    console.log(statusRecebido);
+// Envio do formulário
+formulario.addEventListener('submit', evento => {
+    evento.preventDefault();
+
+    // Validação e normalização dos dados inseridos no formulário de login
+    if (verificarPreenchimento(inputs) && validarDados(inputs)) {
+        loginUsuario.email = formatarValor(inputs[0].value);
+        loginUsuario.password = inputs[1].value;
+
+        // Pedido de login do usuário 
+        const configuracaoPedido = {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify(loginUsuario)
+        }
+
+        // Chamando a API
+        fetch(`${API_URL}/users/login`, configuracaoPedido)
+            .then(respostaInicial => {
+                if ((respostaInicial.status === 200) || (respostaInicial.status === 201)) {
+                    return respostaInicial.json();
+                } else {
+                    throw respostaInicial;  // lança a exceção e pula para o catch(), o qual captura o erro
+                }
+            })
+            .then(respostaFinal => loginSucesso(respostaFinal))
+            .catch(erro => loginErro(erro));
+    } 
+});
+
+// Quando a solicitação é bem-sucedida, o usuário recebe um token, o qual é armazenado no sessionStorage.
+const loginSucesso = respostaServidor => {
+    sessionStorage.setItem("jwt", respostaServidor.jwt);
+    window.location = "tasks.html";
+}
+
+const loginErro = respostaServidor => {
+    console.log("Erro ao logar");
+    console.log(respostaServidor);
+    alert(`Não foi possível logar, verifique o e-mail e/ou senha. Erro: ${respostaServidor.status}.`);
 }

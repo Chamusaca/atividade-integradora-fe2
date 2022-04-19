@@ -1,73 +1,67 @@
-/* Variáveis globais ao escopo do JS */
-let API_URL = 'https://ctd-todo-api.herokuapp.com';
+// URL base da API
+const API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
 
-//Captura as entradas de dados e ações do usuário na página de cadastro
-let campoNomeCadastro = document.getElementById("inputNomeCadastro");
-let campoSobrenomeCadastro = document.getElementById("inputSobrenomeCadastro");
-let campoEmailCadastro = document.getElementById("inputEmailCadastro");
-let campoSenhaCadastro = document.getElementById("inputSenhaCadastro");
-let campoRepetirSenhaCadastro = document.getElementById("inputRepetirSenhaCadastro");
+// Seleção do formulário de cadastro e seus inputs 
+const formulario = document.querySelector("form"); 
+const inputs = document.querySelectorAll("input");
 
-let botaoCriarConta = document.getElementById("botaoCriarContaCadastro");
-
-const usuarioObjetoCadastro = {
+// Dados para cadastro do usuário no aplicativo To-Do
+const cadastroUsuario = {
     firstName: "",
     lastName: "",
     email: "",
     password: ""
 }
 
-botaoCriarConta.addEventListener('click', evento => {
+// Envio do formulário
+formulario.addEventListener('submit', evento => {
     evento.preventDefault();
 
-    //Faz as normalizações e validações
+    // Validação e normalização dos dados inseridos no formulário de cadastro
+    if (verificarPreenchimento(inputs) && validarDados(inputs) && inputs[3].value === inputs[4].value) {
+        let indice = 0;
 
-    //Verifica se todos os campos estão preenchidos
-    if (campoNomeCadastro.value != "" && campoSenhaCadastro.value != "" &&
-        campoEmailCadastro.value != "" && campoSenhaCadastro.value != "" &&
-        campoRepetirSenhaCadastro.value != "") {
+        for (const propriedade in cadastroUsuario) {
+            cadastroUsuario[propriedade] = formatarValor(inputs[indice].value);
+            indice++;
+        }
 
-        //Coloca as informações da tela no objeto
-        usuarioObjetoCadastro.firstName = campoNomeCadastro.value;
-        usuarioObjetoCadastro.lastName = campoSobrenomeCadastro.value;
-        usuarioObjetoCadastro.email = campoEmailCadastro.value;
-        usuarioObjetoCadastro.password = campoSenhaCadastro.value;
+        cadastroUsuario.password = inputs[inputs.length-1].value;  // retira o efeito da aplicação de formatarValor() na senha
 
-        let objetoUsuarioCadastroJson = JSON.stringify(usuarioObjetoCadastro);
-
-        let configuracaoPOST = {
-            method: 'POST',
-            body: objetoUsuarioCadastroJson,
+        // Pedido de cadastro do usuário 
+        const configuracaoPedido = {
+            method: "POST",
             headers: {
                 'Content-type': 'application/json',
             },
-        };
+            body: JSON.stringify(cadastroUsuario)
+        }
 
-        //Chamando a API
-        fetch(`${API_URL}/v1/users`, configuracaoPOST)
-            .then((respostaDoServidor) => {
-                return respostaDoServidor.json();
-                })
-            .then((respostaEmJSON) => {
-                cadastroSucesso(respostaEmJSON.jwt);
+        // Chamando a API
+        fetch(`${API_URL}/users`, configuracaoPedido)
+            .then(respostaInicial => {
+                if ((respostaInicial.status === 200) || (respostaInicial.status === 201)) {
+                    return respostaInicial.json();
+                } else {
+                    throw respostaInicial;  // lança a exceção e pula para o catch(), o qual captura o erro
+                }
             })
-            .catch(error => {
-                cadastroErro(error);
-            });
-    } else {
-        alert("Todos os campos devem ser preenchidos para que possa prosseguir")
+            .then(respostaFinal => cadastroSucesso(respostaFinal))
+            .catch(erro => cadastroErro(erro));
+    } else if (inputs[3].value !== inputs[4].value) {
+        alert("A senha do campo confirmar senha deve ser a mesma do campo senha.");
     }
 });
 
-/*  Ao obter o sucesso, recebe o json (token) do usuário*/
-function cadastroSucesso(jsonRecebido) {
-    console.log("Json recebido ao cadastrar");
-    console.log(jsonRecebido);
-    alert("Usuário cadastrado com sucesso")
-    window.location = "index.html"
+// Quando a solicitação é bem-sucedida, o usuário recebe um token, o qual é armazenado no sessionStorage.
+const cadastroSucesso = respostaServidor => {
+    sessionStorage.setItem("jwt", respostaServidor.jwt);
+    alert("Usuário cadastrado com sucesso.");
+    window.location = "index.html";
 }
 
-function cadastroErro(statusRecebido) {
+const cadastroErro = respostaServidor => {
     console.log("Erro ao cadastrar");
-    console.log(statusRecebido);
+    console.log(respostaServidor);
+    alert(`Não foi possível cadastrar. Erro: ${respostaServidor.status}.`);
 }
