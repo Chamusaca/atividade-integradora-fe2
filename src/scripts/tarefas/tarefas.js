@@ -74,7 +74,7 @@ function listarTodasAsTarefas(tokenDoUsuario) {
         } 
 
         listarTarefas(respostaDoServidorEmJSON);
-        botaoMudarEstato();
+        botaoMudarEstado();
         botaoDeletarTarefa();
 
         })
@@ -83,7 +83,7 @@ function listarTodasAsTarefas(tokenDoUsuario) {
 
 /* ----------------------------REQUISIÇÃO PUT - Alterar estado da tarefa---------------------------- */
 // Botão para mudar o estado da tarefa para não concluída
-function botaoMudarEstato() {
+function botaoMudarEstado() {
     const btnMudarEstado = document.querySelectorAll('.change');
 
     btnMudarEstado.forEach(botao => {
