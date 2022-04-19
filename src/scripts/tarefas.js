@@ -14,7 +14,7 @@ onload = () => {
 }
 
 
-// ------------------ FUNÇÕES PARA COMUNICAÇÃO COM O SERVIDOR ------------------
+/*------------------ FUNÇÕES PARA COMUNICAÇÃO COM O SERVIDOR ------------------*/
 
 // URL base da API
 let API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
@@ -81,8 +81,7 @@ function listarTodasAsTarefas(tokenDoUsuario) {
         .catch(erro => console.log(erro));
 }
 
-
-// REQUISIÇÃO PUT - Alterar estado da tarefa
+/* ----------------------------REQUISIÇÃO PUT - Alterar estado da tarefa---------------------------- */
 // Botão para mudar o estado da tarefa para não concluída
 function botaoMudarEstato() {
     const btnMudarEstado = document.querySelectorAll('.change');
@@ -120,7 +119,7 @@ function botaoMudarEstato() {
   }
 
 
-// ------------------ FUNÇÕES PARA TAREFAS -------------------
+/* --------------------------FUNÇÕES PARA TAREFAS --------------------------------*/
 // Criando uma nova tarefa
 const tokenDoUsuario = localStorage.getItem("jsonRecebido");
 
@@ -187,7 +186,7 @@ formCriarTarefa.addEventListener('submit', function (evento) {
     });
     }
 
-// ------------------ FUNÇÕES PARA MANIPULAÇÃO DO DOM ------------------
+/*------------------ FUNÇÕES PARA MANIPULAÇÃO DO DOM ------------------*/
 
 // Alterar dados do usuário
 function alteraNomeUsuario(dadosUsuario) {
