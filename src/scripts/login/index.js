@@ -1,10 +1,22 @@
+// Variável para a URL base 
+let API_URL = 'https://ctd-todo-api.herokuapp.com/v1';
+
+// Criar variáveis para puxar os valores
+let campoUsuario = document.getElementById('inputEmail');
+let campoSenha = document.getElementById('inputPassword');
+let botaoAcessar = document.getElementById('botaoAcessar');
+
+// Definir o evento de enviar as informações quando clicar no botão
+botaoAcessar.addEventListener("click", function (evento) {
+
+    evento.preventDefault();
 
     const loginUsuario = {
         email: "",
         password: "",
     };
     
-    //Atribui as informações e validadas no Objeto do usuário
+    //Atribui as informações e valida no Objeto do usuário
     loginUsuario.email = campoUsuario.value;
     loginUsuario.password = campoSenha.value;
 
