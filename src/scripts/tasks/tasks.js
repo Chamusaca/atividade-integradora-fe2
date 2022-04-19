@@ -164,7 +164,7 @@ formCriarTarefa.addEventListener('submit', function (evento) {
     const btnDeletarTarefa = document.querySelectorAll('.fa-trash-alt');
 
     btnDeletarTarefa.forEach(botao => {
-      //a cada boton le asignamos una funcionalidad
+      //a cada botão atribuímos uma funcionalidade
       botao.addEventListener('click', function (event) {
         const id = event.target.id;
         const url = `${API_URL}/tasks/${id}`
@@ -231,7 +231,7 @@ function listarTarefas(lista) {
                     <p class="id">ID: ${tarefa.id}</p>
                     <p class="nome">${tarefa.description}</p>
                     <div>
-                        <button><i id="${tarefa.id}" class="fas fa-undo-alt"></i></button>
+                        <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
                         <button><i id="${tarefa.id}" class="far fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -240,7 +240,7 @@ function listarTarefas(lista) {
         } else {
             tarefasPendentes.innerHTML += `
             <li class="tarefa">
-                <div class="not-done" id="${tarefa.id}"></div>
+                <div class="not-done change" id="${tarefa.id}"></div>
                 <div class="descricao">
                     <p class="id">ID: ${tarefa.id}</p>       
                     <p class="nome">${tarefa.description}</p>
