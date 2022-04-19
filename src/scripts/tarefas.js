@@ -81,7 +81,9 @@ function listarTodasAsTarefas(tokenDoUsuario) {
         .catch(erro => console.log(erro));
 }
 
-// Botão para mudar o estado da tarefa
+
+// REQUISIÇÃO PUT - Alterar estado da tarefa
+// Botão para mudar o estado da tarefa para não concluída
 function botaoMudarEstato() {
     const btnMudarEstado = document.querySelectorAll('.change');
 
@@ -118,67 +120,76 @@ function botaoMudarEstato() {
   }
 
 
-// REQUISIÇÃO PUT - Atualizar informações de criar nova tarefa
-function atualizaTarefa(idTarefa, status, tokenDoUsuario) {
+// ------------------ FUNÇÕES PARA TAREFAS -------------------
+// Criando uma nova tarefa
+const tokenDoUsuario = localStorage.getItem("jsonRecebido");
 
-    let configPUT = {
-        method: 'PUT',
-        body: JSON.stringify(
-            {
-                completed: status
-            }
-        ),
+const formCriarTarefa = document.querySelector('.nova-tarefa');
+const novaTarefa = document.querySelector('#novaTarefa');
+
+listarTodasAsTarefas(tokenDoUsuario);
+
+formCriarTarefa.addEventListener('submit', function (evento) {
+    evento.preventDefault();
+    console.log('Criando nova tarefa');
+    console.log(novaTarefa.value);
+    
+    const load = {
+        description: novaTarefa.value.trim(),
+    };
+
+    let configPOST = {
+        method: 'POST',
+        body: JSON.stringify(load),
         headers: {
-            // Preciso passar ambas propriedade pro Headers da requisição
-            'Content-type': 'application/json', //responsável elo json no Body
-            'Authorization': `${tokenDoUsuario}`
+            authorization: tokenDoUsuario,
+            'Content-Type': 'application/json',
         },
-    }
+    };
+    
+    console.log("Criando uma tarefa na API");    
+    fetch(`${API_URL}/tasks/`, configPOST)
+        .then(respostaDoServidor => respostaDoServidor.json())
+        .then(respostaDoServidorEmJSON => {
+            console.log(respostaDoServidorEmJSON);
+            listarTodasAsTarefas(tokenDoUsuario);
+        })
+        .catch(erro => console.log(erro));
+        formCriarTarefa.reset();
+        
+});
 
-    //Chamar a API
-    fetch(`${API_URL}/tasks/${idTarefa}`, configPUT)
-        .then( response => {
-                return response.json()
+  /* ---------------------------------Botão DELETE ----------------------------------------- */
+  // Botão para deletar tarefa
+    function botaoDeletarTarefa() {
+    const btnDeletarTarefa = document.querySelectorAll('.fa-trash-alt');
+
+    btnDeletarTarefa.forEach(botao => {
+      //a cada boton le asignamos una funcionalidad
+      botao.addEventListener('click', function (event) {
+        const id = event.target.id;
+        const url = `${API_URL}/tasks/${id}`
+
+        const settings = {
+          method: 'DELETE',
+          headers: {
+            "Authorization": tokenDoUsuario,
+          }
+        }
+        fetch(url, settings)
+          .then(response => {
+            console.log(response.status);
+            //renderizar novamente as tarefas
+            listarTodasAsTarefas(tokenDoUsuario);
             })
-        .then(function () {
-            alert("A tarefa foi atualizada com sucesso!")
-            //Recarrega a página para atualizar a lista com a "nova" tarefa cadastrada
-            window.location.reload();
-        })
-        .catch(error => {
-            loginErro(error)
+            .catch(error => console.log(error));
         });
-}
-
-/// REQUISIÇÃO DELETE - Deletar uma tarefa
-function deletarTarefa(idTarefa, tokenDoUsuario) {
-
-    let configDELETE = {
-        method: 'DELETE',
-        headers: {
-            'Authorization': tokenDoUsuario
-        },
+    });
     }
-
-    //@@@Chamando a API
-    fetch(`${API_URL}tasks/${idTarefa}`, configDELETE)
-        .then(response => {
-            return response.json();
-        })
-        .then( function () {
-            alert("A tarefa foi deletada com sucesso!")
-            //Recarrega a página para atualiza a lista com a "nova" tarefa cadastrada
-            window.location.reload();
-        })
-        .catch(error => {
-            console.log(error);
-        });
-}
 
 // ------------------ FUNÇÕES PARA MANIPULAÇÃO DO DOM ------------------
 
 // Alterar dados do usuário
-
 function alteraNomeUsuario(dadosUsuario) {
     // Seleciona o p no HTML
     let selectNome = document.getElementById('nomeUsuarioEmTarefas');
@@ -248,70 +259,3 @@ function listarTarefas(lista) {
     }
 });
 }
-
-// ------------------ FUNÇÕES PARA TAREFAS -------------------
-// Criando uma nova tarefa
-const tokenDoUsuario = localStorage.getItem("jsonRecebido");
-
-const formCriarTarefa = document.querySelector('.nova-tarefa');
-const novaTarefa = document.querySelector('#novaTarefa');
-
-listarTodasAsTarefas(tokenDoUsuario);
-
-formCriarTarefa.addEventListener('submit', function (evento) {
-    evento.preventDefault();
-    console.log('Criando nova tarefa');
-    console.log(novaTarefa.value);
-    
-    const load = {
-        description: novaTarefa.value.trim(),
-    };
-
-    let configPOST = {
-        method: 'POST',
-        body: JSON.stringify(load),
-        headers: {
-            authorization: tokenDoUsuario,
-            'Content-Type': 'application/json',
-        },
-    };
-    
-    console.log("Criando uma tarefa na API");    
-    fetch(`${API_URL}/tasks/`, configPOST)
-        .then(respostaDoServidor => respostaDoServidor.json())
-        .then(respostaDoServidorEmJSON => {
-            console.log(respostaDoServidorEmJSON);
-            listarTodasAsTarefas(tokenDoUsuario);
-        })
-        .catch(erro => console.log(erro));
-        formCriarTarefa.reset();
-        
-});
-
-/*                             Botão DELETE                            */
-  /* -------------------------------------------------------------------------- */
-  function botaoDeletarTarefa() {
-    const btnDeletarTarefa = document.querySelectorAll('.fa-trash-alt');
-
-    btnDeletarTarefa.forEach(botao => {
-      //a cada boton le asignamos una funcionalidad
-      botao.addEventListener('click', function (event) {
-        const id = event.target.id;
-        const url = `${API_URL}/tasks/${id}`
-
-        const settings = {
-          method: 'DELETE',
-          headers: {
-            "Authorization": tokenDoUsuario,
-          }
-        }
-        fetch(url, settings)
-          .then(response => {
-            console.log(response.status);
-            //renderizar novamente as tarefas
-            listarTodasAsTarefas(tokenDoUsuario);
-            })
-            .catch(error => console.log(error));
-        });
-    });
-    }
