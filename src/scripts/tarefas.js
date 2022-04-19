@@ -13,28 +13,6 @@ onload = () => {
     }
 }
 
-setTimeout(() => {
-
-    //Ordenando a lista de tarefas pendentes (A - Z)
-    listaTarefasPendentes = listaTarefasPendentes.sort(function (a, b) {
-        return a.description.localeCompare(b.description);
-    });
-
-    //Ordenando a lista de tarefas completas (A - Z)
-    listaTarefasCompletas = listaTarefasCompletas.sort(function (a, b) {
-        return a.description.localeCompare(b.description);
-    });
-
-    //Percorre a lista de tarefas pendentes (já ordenada) e as exibe em tela
-    listaTarefasPendentes.map(tarefa => {
-        renderizaTarefasPendentes(tarefa);
-    });
-
-    //Percorre a lista de tarefas terminadas (já ordenada) e as exibe em tela
-    listaTarefasCompletas.map(tarefa => {
-        renderizaTarefasConcluidas(tarefa);
-    });
-}, 2000);
 
 // ------------------ FUNÇÕES PARA COMUNICAÇÃO COM O SERVIDOR ------------------
 
@@ -97,7 +75,7 @@ function listarTodasAsTarefas(tokenDoUsuario) {
 
         listarTarefas(respostaDoServidorEmJSON);
         botaoMudarEstato();
-        otaoExcluirTarefa();
+        botaoDeletarTarefa();
 
         })
         .catch(erro => console.log(erro));
@@ -245,7 +223,7 @@ function listarTarefas(lista) {
             <div class="timestamp">
             <div>
                 <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
-                <button><i id="${tarefa.id}" class="fas fa-trash-alt delete"></i></button>
+                <button><i id="${tarefa.id}" class="fas fa-trash-alt"></i></button>
             </div>
                 <p class="id">ID: ${tarefa.id}</p>            
                 <p class="nome">${tarefa.description}</p>
@@ -310,146 +288,30 @@ formCriarTarefa.addEventListener('submit', function (evento) {
         
 });
 
-//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
-tarefasPendentesUl.addEventListener('click', function (tarefaClicada) {
+/*                             Botão DELETE                            */
+  /* -------------------------------------------------------------------------- */
+  function botaoDeletarTarefa() {
+    const btnDeletarTarefa = document.querySelectorAll('.fa-trash-alt');
 
-    // tarefaClicada.preventDefault(); //Impede de atualizar a pagina
-    let targetTarefa = tarefaClicada.target;
+    btnDeletarTarefa.forEach(botao => {
+      //a cada boton le asignamos una funcionalidad
+      botao.addEventListener('click', function (event) {
+        const id = event.target.id;
+        const url = `${API_URL}/tasks/${id}`
 
-    if (targetTarefa.className == "not-done") { //Garante que seja clicado apenas na DIV a esqueda e não em qualquer lugar do card.
-        //Invoca função de atualização, passando o uuid, o status e o tokenJWT
-        atualizaTarefa(tarefaClicada.target.id, true, `${tokenDoUsuario}`); // true -> A tarefa passa de "Pendente" para "Finalizada"
-    }
-});
-
-//Card que simboliza nenhuma tarefa pendente cadastrada na API
-function nenhumaTarefaPendenteEncontrada() {
-    let liTarefaPendente = document.createElement('li');
-    liTarefaPendente.classList.add("tarefa");
-
-    liTarefaPendente.innerHTML =
-        `
-        <div class="descricao">
-            <p class="nome">Você ainda não possui nenhuma tarefa cadastrada em nosso sistema</p>
-        </div
-    `
-    //Adiciona a lista principal
-    tarefasPendentesUl.appendChild(liTarefaPendente);
-}
-
-
-// ------------------- FUNÇÕES PARA TAREFAS CONCLUÍDAS --------------------
-
-let tarefasTerminadasUl = document.querySelector(".tarefas-terminadas");
-
-function renderizaTarefasConcluidas(tarefaRecebida) {
-    let liTarefaTerminada = document.createElement('li');
-    liTarefaTerminada.classList.add("tarefa");
-    //liTarefaPendente.setAttribute('class', 'tarefa'); //Também é possível
-
-    liTarefaTerminada.innerHTML =
-        `
-        <div class="done"></div>
-        <div class="descricao">
-            <p class="nome">${tarefaRecebida.description}</p>
-            <div>
-                <button><i id="${tarefaRecebida.id}" class="fas fa-undo-alt change"></i></button>
-                <button><i id="${tarefaRecebida.id}" class="far fa-trash-alt"></i></button>
-            </div>
-        </div>
-    `
-    //Adiciona a lista principal
-    tarefasTerminadasUl.appendChild(liTarefaTerminada);
-}
-
-//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
-tarefasTerminadasUl.addEventListener('click', function (tarefaClicada) {
-    tarefaClicada.preventDefault(); //Impede de atualizar a pagina
-    let targetTarefa = tarefaClicada.target;
-
-    //Trocar o status da atividade para "pendente"
-    if (targetTarefa.className == "fas fa-undo-alt change") {
-        let escolhaUsuario = confirm("Deseja realmente voltar esta tarefa para as 'Tarefas Pendentes' ?");
-        if (escolhaUsuario) {
-            atualizaTarefa(tarefaClicada.target.id, false, tokenDoUsuario); // true -> A tarefa passa de "Pendente" para "Finalizada"
+        const settings = {
+          method: 'DELETE',
+          headers: {
+            "Authorization": tokenDoUsuario,
+          }
         }
+        fetch(url, settings)
+          .then(response => {
+            console.log(response.status);
+            //renderizar novamente as tarefas
+            listarTodasAsTarefas(tokenDoUsuario);
+            })
+            .catch(error => console.log(error));
+        });
+    });
     }
-
-    //Deletar uma tarefa por seu uuid
-    if (targetTarefa.className == "far fa-trash-alt") {
-
-        let escolhaUsuario = confirm("Deseja realmente deletar esta tarefa ?");
-        if (escolhaUsuario) {
-            deletarTarefa(tarefaClicada.target.id, tokenDoUsuario);
-        }
-    }
-});
-
-// ------------------- FUNÇÕES PARA TAREFAS PENDENTES --------------------
-
-let tarefasPendentesUl = document.querySelector(".tarefas-pendentes");
-
-function renderizaTarefasPendentes(tarefaRecebida) {
-
-    //Converte a data de TimeStamp Americano, para Date na formatação PT-BR
-    var dataTarefa = new Date(tarefaRecebida.createdAt).toLocaleDateString("pt-BR")
- 
-    let liTarefaPendente = document.createElement('li');
-    liTarefaPendente.classList.add("tarefa");
-    //liTarefaPendente.setAttribute('class', 'tarefa'); //Outra maneira de setar a classe
-
-
-    //Utilizando o "onclick"
-    // <div class="not-done" id="${tarefaRecebida.id}" onclick="moverTarefaParaTerminada(${tarefaRecebida.id})"></div>
-    liTarefaPendente.innerHTML =
-        `
-        <div class="not-done" id="${tarefaRecebida.id}"></div>
-        <div class="descricao">
-            <p class="nome">ID:${tarefaRecebida.id}</p>
-            <p class="nome">${tarefaRecebida.description}</p>
-            <p class="timestamp"><i class="far fa-calendar-alt"></i> ${dataTarefa}</p>
-        </div
-    `
-    //Adiciona a lista principal
-    tarefasPendentesUl.appendChild(liTarefaPendente);
-}
-/* Função utilizada quando se opta pr usar o 'onclick' ao invez da captura pelo 'target' */
-function moverTarefaParaTerminada(idTarefa) {
-    let escolhaUsuario = confirm("Deseja realmente mover esta tarefa para as 'Tarefas Terminadas' ?");
-    if (escolhaUsuario) {
-        let cookieJwt = getCookie("jwt");
-        //Invoca função de atualização, passando o uuid, o status e o tokenJWT
-        atualizaTarefa(idTarefa, true, cookieJwt); // true -> A tarefa passa de "Pendente" para "Finalizada"
-    }
-
-}
-
-//Captura toda a lista e verifica qual foi o elemento clicado (com o target)
-tarefasPendentesUl.addEventListener('click', function (tarefaClicada) {
-    tarefaClicada.preventDefault(); //Impede de atualizar a pagina
-    let targetTarefa = tarefaClicada.target;
-
-    if (targetTarefa.className == "not-done") { //Garante que seja clicado apenas na DIV a esqueda e não em qualquer lugar do card.
-        let escolhaUsuario = confirm("Deseja realmente mover esta tarefa para as 'Tarefas Terminadas' ?");
-        if (escolhaUsuario) {
-            let cookieJwt = getCookie("jwt");
-            //Invoca função de atualização, passando o uuid, o status e o tokenJWT
-            atualizaTarefa(tarefaClicada.target.id, true, cookieJwt); // true -> A tarefa passa de "Pendente" para "Finalizada"
-        }
-    }
-});
-
-//Card que simboliza quando nenhuma tarefa foi encontrada na API
-function nenhumaTarefaPendenteEncontrada() {
-    let liTarefaPendente = document.createElement('li');
-    liTarefaPendente.classList.add("tarefa");
-
-    liTarefaPendente.innerHTML =
-        `
-        <div class="descricao">
-            <p class="nome">Você ainda não possui nenhuma tarefa cadastrada no sistema</p>
-        </div
-    `
-    //Adiciona a lista principal
-    tarefasPendentesUl.appendChild(liTarefaPendente);
-}
