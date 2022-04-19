@@ -224,37 +224,30 @@ function listarTarefas(lista) {
 
     lista.forEach(tarefa => {
         let terminada = new Date(tarefa.createdAt);
-    if (tarefa.completed) {
-        tarefasConcluidas.innerHTML += `
-        <li class="tarefa">
-            <div class="done"></div>
-            <div class="descricao">
-            <div class="nome">
-            <div class="timestamp">
-            <div>
-                <button><i id="${tarefa.id}" class="fas fa-undo-alt change"></i></button>
-                <button><i id="${tarefa.id}" class="fas fa-trash-alt"></i></button>
-            </div>
-                <p class="id">ID: ${tarefa.id}</p>            
-                <p class="nome">${tarefa.description}</p>
-                <p class="timestamp"><i class="far fa-calendar-alt"></i>${terminada.toLocaleDateString()} <i class="far fa-clock"></i>${terminada.getHours()}:${terminada.getMinutes()}</p>
-            </div>
-        </li>
-        `
-    } else {
-        tarefasPendentes.innerHTML += `
-        <li class="tarefa">
-            <div class="not-done change" id="${tarefa.id}"></div>
-            <div class="descricao">
-            <div class="nome">
-            <div class="timestamp">
-            <div>
-                <p class="id">ID: ${tarefa.id}</p>       
-                <p class="nome">${tarefa.description}</p>
-                <p class="timestamp"><i class="far fa-calendar-alt"></i> ${terminada.toLocaleDateString()} <i class="far fa-clock"></i> ${terminada.getHours()}:${terminada.getMinutes()}</p>
-            </div>
-        </li>
-        `
-    }
+        if (tarefa.completed) {
+            tarefasConcluidas.innerHTML += `
+            <li class="tarefa">
+                <div class="descricao">
+                    <p class="id">ID: ${tarefa.id}</p>
+                    <p class="nome">${tarefa.description}</p>
+                    <div>
+                        <button><i id="${tarefa.id}" class="fas fa-undo-alt"></i></button>
+                        <button><i id="${tarefa.id}" class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </li>
+            `
+        } else {
+            tarefasPendentes.innerHTML += `
+            <li class="tarefa">
+                <div class="not-done" id="${tarefa.id}"></div>
+                <div class="descricao">
+                    <p class="id">ID: ${tarefa.id}</p>       
+                    <p class="nome">${tarefa.description}</p>
+                    <p class="timestamp"><i class="far fa-calendar-alt"></i> ${terminada.toLocaleDateString()} <i class="far fa-clock"></i> ${terminada.getHours()}:${terminada.getMinutes()}</p>
+                </div>
+            </li>
+            `
+        }
 });
 }
