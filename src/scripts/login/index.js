@@ -33,7 +33,11 @@ botaoAcessar.addEventListener("click", function (evento) {
     // Fetch para enviar informações pro servidor
     fetch(`${API_URL}/users/login`, configuracoesPOST)
     .then((response) => {
-        return response.json();})
+        if (response.status == 201){
+            return response.json();
+        }
+        throw response;
+        })
     .then((respostaEmJSON) => {
         console.log(respostaEmJSON);
         loginSucesso(respostaEmJSON.jwt);
@@ -51,7 +55,6 @@ function loginSucesso(jsonRecebido) {
 }
 
 function loginErro(statusRecebido) {
-    console.log("Erro ao logar");
-    console.log(statusRecebido);
+    alert("Erro ao logar, email e/ou senha incorretos");
 }
 
